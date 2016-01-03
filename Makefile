@@ -1,15 +1,6 @@
-PYCAT_CMD=./pycatalog.py
-CURRENT_TEXT_DEFS=text_defs_2016
-OBFUSCATED_MARKER_FILE=.obfuscated
-GIT_REPO=https://github.com/nathankrueger/pycatalog
-RECENT_FILE_NUM=100
-SYNC_DIR=./
-
-ec:
-	gpg -c $(FILE)
-
-dc:
-	gpg $(FILE)
+NCMD_CLIENT_CMD=./ncmd_client.py
+NCMD_SERVER_CMD=./ncmd_server.py
+DEFAULT_PORT=10123
 
 # Git stuff
 co:
@@ -33,21 +24,6 @@ revert:
 repo:
 	open $(GIT_REPO)
 
-# PC stuff
-keys:
-	$(PYCAT_CMD) --dump_keywords
-
-sync_recent:
-	$(PYCAT_CMD) --all --timesort --list --no_play --limit=$(RECENT_FILE_NUM) | xargs -I % cp % $(SYNC_DIR)
-
-update:
-	$(PYCAT_CMD) --update=$(CURRENT_TEXT_DEFS)
-
-load:
-	$(PYCAT_CMD) --input=$(CURRENT_TEXT_DEFS)
-
-reload: clean load
-
+# NCMD stuff
 clean:
-	touch catalog.db default.m3u $(OBFUSCATED_MARKER_FILE)
-	rm catalog.db default.m3u $(OBFUSCATED_MARKER_FILE)
+	rm *.pyc
