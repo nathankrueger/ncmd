@@ -11,6 +11,7 @@ import re
 import ncmd_print as np
 from ncmd_print import ErrorLevel as ErrorLevel
 
+QUIT_CMD = "quit now"
 HOST = ""
 PORT = 10123
 ROOT_DIR_PATH = "/share/"
@@ -35,7 +36,7 @@ def acceptConnection(server_sock):
 def processData(data):
 	quit = False
 	np.print_msg("Received command: {0}".format(data), ErrorLevel.INFO)
-	if data == 'q':
+	if data == QUIT_CMD:
 		quit = True
 	
 	return quit
