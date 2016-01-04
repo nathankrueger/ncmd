@@ -24,7 +24,7 @@ def main():
 
 	if client_sock:
 		np.print_msg("Successfully connected to host: {0}:{1}".format(HOST, PORT), ErrorLevel.INFO)
-		client_sock.sendall("Hello World!")
+		client_sock.sendall(sys.argv[1])
 
 	# Keep this at the end for safety!
 	if client_sock:
