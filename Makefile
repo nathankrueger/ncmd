@@ -1,6 +1,7 @@
 NCMD_CLIENT_CMD=./ncmd_client.py
 NCMD_SERVER_CMD=./ncmd_server.py
 DEFAULT_PORT=10123
+GIT_REPO=https://github.com/nathankrueger/ncmd
 
 # Git stuff
 co:
