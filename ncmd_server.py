@@ -10,11 +10,13 @@ import re
 # NCMD Libs
 import ncmd_print as np
 from ncmd_print import ErrorLevel as ErrorLevel
+import ncmd_commands as ncmds
+import ncmd_fileops as nfops
 
 QUIT_CMD = "quit now"
 HOST = ""
 PORT = 10123
-ROOT_DIR_PATH = "/share/"
+ROOT_DIR_PATH = "/share/CACHEDEV1_DATA"
 
 def bindServerSocket():
 	server_sock = None
@@ -36,9 +38,32 @@ def acceptConnection(server_sock):
 def processData(data):
 	quit = False
 	np.print_msg("Received command: {0}".format(data), ErrorLevel.INFO)
-	if data == QUIT_CMD:
+
+	dest = ncmds.getCmdDest(data)
+	srcs = getCommandSrcs(data)
+
+	if ncmds.isQuitSequence(data):
 		quit = True
-	
+	elif ncmds.isMove(data):
+		for src in srcs:
+			if nfops.move(src, dest):
+				# Respond Success
+			else:
+				# Respond failure
+		
+	elif ncmds.isCopy(data):
+		for src in srcs:
+			if nfops.copy(src, dest):
+				# Respond Success
+			else:
+				# Respond failure
+
+	elif ncmds.isRemove(data):
+		if nfops.remove(dest):
+			# Respond Success
+		else:
+			# Respond failure
+
 	return quit
 
 def main():

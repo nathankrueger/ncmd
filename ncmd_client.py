@@ -10,9 +10,9 @@ import argparse
 # NCMD Libs
 import ncmd_print as np
 from ncmd_print import ErrorLevel as ErrorLevel
+import ncmd_commands as ncmds
 
-QUIT_CMD = 'quit now'
-recognized_cmds = ['cp', 'mv', 'rm', 'quit']
+recognized_cmds = ncmd.getRecognizedCmds()
 
 def getArgs():
 	parser = argparse.ArgumentParser(description='Copy, move, remove quickly on a remotely mounted folder.')
@@ -24,18 +24,6 @@ def getArgs():
 	parser.add_argument('--non_blocking', action='store_true', help='Don\'t block on command completion.')
 	return parser.parse_args()
 
-def parseSrcs(src_list):
-	result = ''
-	first = True
-	for src in src_list:
-		if first:
-			first = False
-		else:
-			result += " "
-		result += src
-
-	return result
-
 def main():
 	args = getArgs()
 	HOST="192.168.1.189"
@@ -43,20 +31,17 @@ def main():
 	blocking = '1'
 	if args.non_blocking:
 		blocking = '0'
-	cmd = args.cmd
-	dest = args.dest
 
 	if not cmd in recognized_cmds:
-		np.print_msg("Unrecognized command: {0}".format(cmd), ErrorLevel.ERROR)
+		np.print_msg("Unrecognized command: {0}".format(args.cmd), ErrorLevel.ERROR)
 		sys.exit()
 	
-	source_str = parseSrcs(args.src)
-
-	if not cmd == 'quit':
-		ncmd = "cmd:({0}) src:({1}) dest:({2}) blocking:({3})".format(cmd, source_str, dest, blocking)
+	if ncmds.isQuitCmd(args.cmd):
+		ncmd = ncmds.getQuitSequence()
 	else:
-		ncmd = QUIT_CMD
-	print ncmd
+		ncmd = ncmds.genCommand(args.cmd, args.src, args.dest, blocking)
+
+	np.print_msg("Command to send: {0}".format(ncmd, ErrorLevel.DEBUG)
 
 	if args.port:
 		PORT = args.port
