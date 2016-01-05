@@ -12,7 +12,7 @@ import ncmd_print as np
 from ncmd_print import ErrorLevel as ErrorLevel
 import ncmd_commands as ncmds
 
-recognized_cmds = ncmd.getRecognizedCmds()
+recognized_cmds = ncmds.getRecognizedCmds()
 
 def getArgs():
 	parser = argparse.ArgumentParser(description='Copy, move, remove quickly on a remotely mounted folder.')
@@ -32,7 +32,7 @@ def main():
 	if args.non_blocking:
 		blocking = '0'
 
-	if not cmd in recognized_cmds:
+	if not args.cmd in recognized_cmds:
 		np.print_msg("Unrecognized command: {0}".format(args.cmd), ErrorLevel.ERROR)
 		sys.exit()
 	
@@ -41,7 +41,7 @@ def main():
 	else:
 		ncmd = ncmds.genCommand(args.cmd, args.src, args.dest, blocking)
 
-	np.print_msg("Command to send: {0}".format(ncmd, ErrorLevel.DEBUG)
+	np.print_msg("Command to send: {0}".format(ncmd), ErrorLevel.DEBUG)
 
 	if args.port:
 		PORT = args.port

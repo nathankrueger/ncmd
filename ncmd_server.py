@@ -39,8 +39,8 @@ def processData(data):
 	quit = False
 	np.print_msg("Received command: {0}".format(data), ErrorLevel.INFO)
 
-	dest = ncmds.getCmdDest(data)
-	srcs = getCommandSrcs(data)
+	dest = ncmds.getCommandDest(data)
+	srcs = ncmds.getCommandSrcs(data)
 
 	if ncmds.isQuitSequence(data):
 		quit = True
@@ -48,21 +48,27 @@ def processData(data):
 		for src in srcs:
 			if nfops.move(src, dest):
 				# Respond Success
+				pass
 			else:
 				# Respond failure
-		
+				pass
+
 	elif ncmds.isCopy(data):
 		for src in srcs:
 			if nfops.copy(src, dest):
 				# Respond Success
+				pass
 			else:
 				# Respond failure
+				pass
 
 	elif ncmds.isRemove(data):
 		if nfops.remove(dest):
 			# Respond Success
+			pass
 		else:
 			# Respond failure
+			pass
 
 	return quit
 

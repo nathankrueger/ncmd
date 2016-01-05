@@ -47,9 +47,9 @@ def remove(target):
 			os.remove(target)
 		elif isDirectory(target):
 			shutil.rmtree(target)
-		np.print_msg("Moved {0} to {1}...".format(src, dest), ErrorLevel.INFO)
+		np.print_msg("Removed {0}...".format(target), ErrorLevel.INFO)
 	except Exception as err:
-		np.print_msg("Failed to move {0} to {1}...\n\t{2}".format(src, dest, err), ErrorLevel.ERROR)
+		np.print_msg("Failed to remove {0}...\n\t{2}".format(target, err), ErrorLevel.ERROR)
 		result = False
 
 	return result
