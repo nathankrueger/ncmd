@@ -96,6 +96,10 @@ def main():
 	
 	client_mnt = getClientMount(args.client_mount)
 	server_mnt = getServerMount(args.server_mount)
+	
+	# Some debug messages to help the user figure out what their mounts are if not explicitly set
+	np.print_msg("Using client mount: {0}".format(client_mnt), MessageLevel.DEBUG)
+	np.print_msg("Using server mount: {0}".format(server_mnt), MessageLevel.DEBUG)
 
 	quit = ncmds.isQuitCmd(args.cmd)
 	if quit:
