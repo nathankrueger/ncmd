@@ -7,7 +7,7 @@ import sys
 
 # NCMD Libs
 import ncmd_print as np
-from ncmd_print import ErrorLevel as ErrorLevel
+from ncmd_print import MessageLevel as MessageLevel
 
 def isFile(path):
 	return os.path.isfile(path)
@@ -22,9 +22,9 @@ def copy(src, dest):
 			shutil.copy(src, dest)
 		elif isDirectory(src):
 			shutil.copytree(src, dest)
-		np.print_msg("Copied {0} to {1}...".format(src, dest), ErrorLevel.INFO)
+		np.print_msg("Copied {0} to {1}".format(src, dest), MessageLevel.INFO)
 	except Exception as err:
-		np.print_msg("Failed to copy {0} to {1}...\n\t{2}".format(src, dest, err), ErrorLevel.ERROR)
+		np.print_msg("Failed to copy {0} to {1} ...\n\t{2}".format(src, dest, err), MessageLevel.ERROR)
 		result = False
 	
 	return result
@@ -33,9 +33,9 @@ def move(src, dest):
 	result = True
 	try:
 		shutil.move(src, dest)
-		np.print_msg("Moved {0} to {1}...".format(src, dest), ErrorLevel.INFO)
+		np.print_msg("Moved {0} to {1}".format(src, dest), MessageLevel.INFO)
 	except Exception as err:
-		np.print_msg("Failed to move {0} to {1}...\n\t{2}".format(src, dest, err), ErrorLevel.ERROR)
+		np.print_msg("Failed to move {0} to {1} ...\n\t{2}".format(src, dest, err), MessageLevel.ERROR)
 		result = False
 
 	return result
@@ -47,9 +47,9 @@ def remove(target):
 			os.remove(target)
 		elif isDirectory(target):
 			shutil.rmtree(target)
-		np.print_msg("Removed {0}...".format(target), ErrorLevel.INFO)
+		np.print_msg("Removed {0}".format(target), MessageLevel.INFO)
 	except Exception as err:
-		np.print_msg("Failed to remove {0}...\n\t{2}".format(target, err), ErrorLevel.ERROR)
+		np.print_msg("Failed to remove {0} ...\n\t{2}".format(target, err), MessageLevel.ERROR)
 		result = False
 
 	return result

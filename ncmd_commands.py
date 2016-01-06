@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import re
 
 class NCMD_CMDS:
@@ -18,6 +16,10 @@ STATUS_KEY='status'
 SUCCESS_RESP='success'
 FAILURE_RESP='fail'
 
+# This has been arbitrarily chosen for now, can be upped to support copies and moves
+# with many sources and or long file paths.
+MAX_CMD_SIZE=2048
+
 def genStringFromList(input_list):
 	return " ".join(input_list)
 
@@ -26,27 +28,27 @@ def genCommand(cmd, source_list, dest, block):
 	return "{0}:({1}) {2}:({3}) {4}:({5}) {6}:({7})".format(CMD_KEY, cmd, SRCS_KEY, srcs, DEST_KEY, dest, BLOCK_KEY, block)
 
 def genCmdSuccessResp(ncmd):
-	return "{0}:(1}) {2}:({3})".format(RESP_KEY, ncmd, STATUS_KEY, SUCCESS_RESP)
+	return "{0}:({1}) {2}:({3})".format(RESP_KEY, ncmd, STATUS_KEY, SUCCESS_RESP)
 
 def genCmdFailureResp(ncmd):
-	return "{0}:(1}) {2}:({3})".format(RESP_KEY, ncmd, STATUS_KEY, FAILURE_RESP)
+	return "{0}:({1}) {2}:({3})".format(RESP_KEY, ncmd, STATUS_KEY, FAILURE_RESP)
 
 def isSuccessfulRsp(nrsp):
 	return getResponseStatus(nrsp) == SUCCESS_RESP
 
-def isUnsuccessfulRsp(nrsp):
+def isFailureRsp(nrsp):
 	return getResponseStatus(nrsp) == FAILURE_RESP
 
 def getResponseStatus(nrsp):
 	result = ''
-	match = re.search(r'{0}:\(.+\) {1}:\((.+)\)'.format(RESP_KEY, STATUS_KEY))
+	match = re.search(r'{0}:\(.+\) {1}:\((.+)\)'.format(RESP_KEY, STATUS_KEY), nrsp)
 	if match:
 		result = match.group(1)
 	return result
 
 def isResponse(ncmd, nrsp):
 	result = False
-	match = re.search(r'{0}:\((.+)\) {1}:\(.+\)'.format(RESP_KEY, STATUS_KEY))
+	match = re.search(r'{0}:\((.+)\) {1}:\(.+\)'.format(RESP_KEY, STATUS_KEY), nrsp)
 	if match:
 		result = (match.group(1) == ncmd)
 	return result
