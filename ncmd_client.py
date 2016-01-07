@@ -89,7 +89,7 @@ def main():
 	if args.non_blocking:
 		blocking = '0'
 
-	# Parese the command.
+	# Parse the command.
 	if not args.cmd in recognized_cmds:
 		np.print_msg("Unrecognized command: {0}".format(args.cmd), MessageLevel.ERROR)
 		sys.exit()
@@ -97,7 +97,7 @@ def main():
 	client_mnt = getClientMount(args.client_mount)
 	server_mnt = getServerMount(args.server_mount)
 	
-	# Some debug messages to help the user figure out what their mounts are if not explicitly set
+	# Some debug messages to help the user figure out what their mounts are if not explicitly set.
 	np.print_msg("Using client mount: {0}".format(client_mnt), MessageLevel.DEBUG)
 	np.print_msg("Using server mount: {0}".format(server_mnt), MessageLevel.DEBUG)
 
