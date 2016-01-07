@@ -37,35 +37,35 @@ def getLastMntFileContents():
 	result = ''
 	try:
 		if os.path.isfile(LAST_MNT_FILENAME):
-			f = open('r', LAST_MNT_FILENAME)
-			result = f.readline()
+			f = open(LAST_MNT_FILENAME, 'r')
+			result = f.read()
 			f.close()
 	except Exception as err:
-		np.print_msg("An error occured retrieving the previous mount file: {0}".format(err), MessageLevel.Error)
+		np.print_msg("An error occured retrieving the previous mount file: {0}".format(err), MessageLevel.ERROR)
 		result = ''
 
 	return result
 
 def writeLastMntFile(client_mount_path, server_mount_path):
 	try:
-		f = open('w', LAST_MNT_FILENAME)
+		f = open(LAST_MNT_FILENAME, 'w')
 		f.write(client_mount_path)
 		f.write(server_mount_path)
 		f.close()
 	except Exception as err:
-		np.print_msg("An error occured writing the previous mount file: {0}".format(err), MessageLevel.Error)
+		np.print_msg("An error occured writing the previous mount file: {0}".format(err), MessageLevel.ERROR)
 		result = ''
 		
 def getClientMount(client_arg):
 	result = client_arg
 	if not result:
-		result = getLastClientMount()
+		result = getLastClientMnt()
 	return result
 
 def getServerMount(client_arg):
 	result = client_arg
 	if not result:
-		result = getLastServerMount()
+		result = getLastServerMnt()
 	return result
 
 def getArgs():
@@ -127,6 +127,11 @@ def main():
 	if client_sock:
 		np.print_msg("Successfully connected to host: {0}:{1}".format(HOST, PORT), MessageLevel.INFO)
 		client_sock.sendall(ncmd)
+
+		# Close the connection on the client when quitting to allow socket reuse!
+		if quit:
+			client_sock.close()
+			client_sock = None
 
 		# We only expect responses for blocking commands, and expect none for the quit cmd.
 		if not args.non_blocking and not quit:

@@ -7,6 +7,7 @@ import shutil
 import sys
 import re
 import datetime
+import argparse
 
 # NCMD Libs
 import ncmd_print as np
@@ -21,11 +22,12 @@ PORT = 10123
 ROOT_DIR_PATH = "/share/CACHEDEV1_DATA"
 
 # Set up the server socket
-def bindServerSocket():
+def bindServerSocket(port):
 	server_sock = None
 	try:
 		server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		server_sock.bind((HOST, PORT))
+		server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		server_sock.bind((HOST, port))
 		np.print_msg("Successfully bound server socket to port:{0}".format(PORT), MessageLevel.INFO)
 	except Exception as err:
 		np.print_msg("Failed to bind server socket to port:{0}".format(PORT), MessageLevel.ERROR)
@@ -75,7 +77,13 @@ def processCmd(ncmd):
 				cmd_success = False
 
 	elif ncmds.isRemove(ncmd):
-		cmd_success = nfops.remove(dest)
+		# This naming here is ideal, but this code gets the job done!
+		for src in srcs:
+			if not nfops.remove(src):
+				cmd_success = False
+
+		if not nfops.remove(dest):
+			cmd_success = False
 
 	return quit, cmd_success
 
@@ -94,8 +102,21 @@ def processConnection(conn):
 	conn.close()
 	return quit
 
+def getArgs():
+	parser = argparse.ArgumentParser(description='Copy, move, remove quickly on a remotely mounted folder.')
+	parser.add_argument('--port', type=int, help='Specify a custom port.')
+
+	return parser.parse_args()
+
 def main():
-	server_sock = bindServerSocket()
+	# Get the port
+	args = getArgs()
+	server_port = PORT
+	if args.port:
+		server_port = args.port
+
+	# Bind the sever socket
+	server_sock = bindServerSocket(server_port)
 	if server_sock:
 		while True:
 			conn = None
