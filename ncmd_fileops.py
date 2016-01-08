@@ -62,3 +62,11 @@ def remove(target):
 
 	return result
 
+def convertPath(src_mnt, target_mnt, path):
+	result = ""
+	if path.find(src_mnt) == 0:
+		result = target_mnt
+		result += path[len(src_mnt):]
+	
+	return result
+

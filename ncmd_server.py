@@ -105,6 +105,7 @@ def processConnection(conn):
 def getArgs():
 	parser = argparse.ArgumentParser(description='Copy, move, remove quickly on a remotely mounted folder.')
 	parser.add_argument('--port', type=int, help='Specify a custom port.')
+	parser.add_argument('--server_mount', type=str, help='Specify a mount for the server.')
 
 	return parser.parse_args()
 
