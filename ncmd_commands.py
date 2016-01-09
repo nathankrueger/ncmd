@@ -88,10 +88,11 @@ def getCommandCmd(cmd):
 
 def getCommandSrcs(cmd):
 	result = []
-	match = re.search(r'{0}:\((.+?)\)'.format(SRCS_KEY), cmd)
+	match = re.search(r'{0}:\((.*?)\)'.format(SRCS_KEY), cmd)
 	if match:
 		result_str = match.group(1)
-		result = result_str.split(" ")
+		if len(result_str) > 0:
+			result = result_str.split(" ")
 	return result
 
 def getCommandDest(cmd):

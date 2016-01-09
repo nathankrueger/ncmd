@@ -11,6 +11,7 @@ import argparse
 import ncmd_print as np
 from ncmd_print import MessageLevel as MessageLevel
 import ncmd_commands as ncmds
+import ncmd_fileops
 
 recognized_cmds = ncmds.getRecognizedCmds()
 LAST_MNT_FILENAME=".lastmnt"
@@ -101,11 +102,27 @@ def main():
 	np.print_msg("Using client mount: {0}".format(client_mnt), MessageLevel.DEBUG)
 	np.print_msg("Using server mount: {0}".format(server_mnt), MessageLevel.DEBUG)
 
+	# Convert the client path to a server path, if possible
+	sources = []
+	destination = ''
+	if (client_mnt and server_mnt):
+		# Add sources we can parse -- in the future maybe we should error out and warn the user if we can't
+		for src in args.src:
+			converted_source = ncmd_fileops.convertPath(client_mnt, server_mnt, src)
+			if converted_source:
+				sources.append(converted_source)
+	
+		destination = ncmd_fileops.convertPath(client_mnt, server_mnt, args.dest)
+
+	else:
+		sources = args.src
+		destination = args.dest
+		
 	quit = ncmds.isQuitCmd(args.cmd)
 	if quit:
 		ncmd = ncmds.getQuitSequence()
 	else:
-		ncmd = ncmds.genCommand(args.cmd, args.src, args.dest, blocking)
+		ncmd = ncmds.genCommand(args.cmd, sources, destination, blocking)
 
 	np.print_msg("Command to send: {0}".format(ncmd), MessageLevel.DEBUG)
 

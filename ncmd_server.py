@@ -41,6 +41,25 @@ def acceptConnection(server_sock):
 	conn, addr = server_sock.accept()
 	return (conn, addr)
 
+# Validate a path against the server mount
+def validatePath(path, server_mnt):
+	result = False
+	# Paths beginning with the server mount are considered 'valid'
+	if path.find(server_mnt) == 0:
+		result = True
+
+	return result
+
+# Validate source / destination paths
+def validatePaths(paths, server_mnt):
+	result = True
+	for path in paths:
+		if not validatePath(path, server_mnt):
+			result = False
+			break
+	
+	return result
+
 # Deal with generating the appropriate response for a command
 def processResponse(ncmd, success):
 	nresp = ''
@@ -55,42 +74,51 @@ def processResponse(ncmd, success):
 	return nresp
 
 # Handle the current command string -- the actual file operations occur here
-def processCmd(ncmd):
-	np.print_msg("Received command: {0}".format(ncmd), MessageLevel.INFO)
-	dest = ncmds.getCommandDest(ncmd)
-	srcs = ncmds.getCommandSrcs(ncmd)
-
+def processCmd(ncmd, args):
 	quit = False
 	cmd_success = True
+	np.print_msg("Received command: {0}".format(ncmd), MessageLevel.INFO)
 
+	dest = ncmds.getCommandDest(ncmd)
+	srcs = ncmds.getCommandSrcs(ncmd)
+	
 	if ncmds.isQuitSequence(ncmd):
 		quit = True
 
-	elif ncmds.isMove(ncmd):
-		for src in srcs:
-			if not nfops.move(src, dest):
-				cmd_success = False
-
-	elif ncmds.isCopy(ncmd):
-		for src in srcs:
-			if not nfops.copy(src, dest):
-				cmd_success = False
-
-	elif ncmds.isRemove(ncmd):
-		# This naming here is ideal, but this code gets the job done!
-		for src in srcs:
-			if not nfops.remove(src):
-				cmd_success = False
-
-		if not nfops.remove(dest):
-			cmd_success = False
+	else:
+		if args.validate_server_mount:
+			srcs_valid = validatePaths(srcs, args.validate_server_mount)
+			dest_valid = validatePath(dest, args.validate_server_mount)
+			cmd_success = srcs_valid and dest_valid
+	
+		# Only try and conduct file operations when validation is disabled,
+		# or if validation is enabled, and it passes.
+		if cmd_success:	
+			if ncmds.isMove(ncmd):
+				for src in srcs:
+					if not nfops.move(src, dest):
+						cmd_success = False
+	
+			elif ncmds.isCopy(ncmd):
+				for src in srcs:
+					if not nfops.copy(src, dest):
+						cmd_success = False
+	
+			elif ncmds.isRemove(ncmd):
+				# The naming here isn't ideal, but this code gets the job done!
+				for src in srcs:
+					if not nfops.remove(src):
+						cmd_success = False
+	
+				if not nfops.remove(dest):
+					cmd_success = False
 
 	return quit, cmd_success
 
 # Deal with the current connection, getting, sending, and closing
-def processConnection(conn):
+def processConnection(conn, args):
 	ncmd = conn.recv(ncmds.MAX_CMD_SIZE)
-	quit, cmd_success = processCmd(ncmd)
+	quit, cmd_success = processCmd(ncmd, args)
 
 	resp = processResponse(ncmd, cmd_success)
 	if len(resp) > 0:
@@ -105,7 +133,7 @@ def processConnection(conn):
 def getArgs():
 	parser = argparse.ArgumentParser(description='Copy, move, remove quickly on a remotely mounted folder.')
 	parser.add_argument('--port', type=int, help='Specify a custom port.')
-	parser.add_argument('--server_mount', type=str, help='Specify a mount for the server.')
+	parser.add_argument('--validate_server_mount', type=str, help='Specify a mount on the server to validate incoming paths against.')
 
 	return parser.parse_args()
 
@@ -129,7 +157,7 @@ def main():
 				conn = None
 		
 			if conn:
-				quit = processConnection(conn)
+				quit = processConnection(conn, args)
 				if quit:
 					np.print_msg("Server shutdown requested @ {0}...".format(datetime.datetime.now()), MessageLevel.INFO)
 					break
